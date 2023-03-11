@@ -1,10 +1,14 @@
-from posts.models import Comment, Follow, Group, Post, User
 from rest_framework import fields, serializers
 from rest_framework.validators import UniqueTogetherValidator
 
+from posts.models import Comment, Follow, Group, Post, User
+
 
 class PostSerializer(serializers.ModelSerializer):
-    author = serializers.StringRelatedField(read_only=True)
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username'
+    )
     image = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
@@ -13,12 +17,16 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    post = serializers.PrimaryKeyRelatedField(read_only=True)
-    author = serializers.StringRelatedField(read_only=True)
+    author = serializers.SlugRelatedField(
+        required=False,
+        read_only=True,
+        slug_field='username'
+    )
 
     class Meta:
         fields = ('id', 'author', 'post', 'text', 'created',)
         model = Comment
+        read_only_fields = ('post',)
 
 
 class GroupSerializer(serializers.ModelSerializer):
